@@ -1,0 +1,27 @@
+#!/bin/sh
+fullpath=`readlink -f $0`
+curdir="`dirname ${fullpath}`"
+conf="$curdir/ectl-conf"
+test -f "$conf" && . "$conf"
+
+DHOME=$curdir
+DHOME_DIR=`dirname "$DHOME"`
+DHOME_BASE=`basename "$DHOME_DIR"`
+
+LIB_DIR=`dirname "$DHOME_DIR"`
+EBINZ="${LIB_DIR}/${DHOME_BASE}.ez/${DHOME_BASE}/ebin"
+EBIN="${LIB_DIR}/${DHOME_BASE}/ebin"
+
+ERPHER_DIR=`dirname "$LIB_DIR"`
+ERLBIN=`find $ERPHER_DIR/erts* -name erl`
+
+exec $ERLBIN \
+    -pa "${EBIN}" \
+    -pa "${EBINZ}" \
+    -noinput \
+    -hidden \
+    ${CTL_ERL_ARGS} \
+    -name "ctl${$}_${EXT_NODENAME}" \
+    -s erpher_extra_ctl \
+    -nodename $EXT_NODENAME \
+    -extra "$@"
